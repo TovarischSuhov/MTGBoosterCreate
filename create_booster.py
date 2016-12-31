@@ -5,7 +5,7 @@ import requests
 import json
 import random
 import os
-import pycurl
+import shutil
 
 def main():
     random.seed()
@@ -16,10 +16,11 @@ def main():
 
     sets = json.loads(requests.get('https://api.magicthegathering.io/v1/sets', data = {"block": args.block}).text)["sets"]
     i = 0
+    olddir = os.getcwd()
     while i < args.count:
         i += 1;
         s = sets[random.randint(0, len(sets)-1)]
-        dirname = "/tmp/booster_" + str(i)
+        dirname = "/tmp/booster"
         try:
             os.makedirs(dirname)
         except:
@@ -34,7 +35,11 @@ def main():
             fin = open(path, "w+b")
             fin.write(picture.content)
             fin.close()
-            
+        shutil.copy("template.tex", dirname)
+        os.chdir(dirname)
+        os.system("pdflatex " + "template.tex")
+        os.chdir(olddir)
+        shutil.copy(dirname + "/template.pdf", "booster" + str(i) + ".pdf")
 
 if __name__ == "__main__":
     main()
