@@ -10,16 +10,23 @@ import shutil
 def main():
     random.seed()
     parser = argparse.ArgumentParser(description="Creates boosters from selected block or set")
-    parser.add_argument("-b", "--block", type=str, help="Sets block to create booster")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-b", "--block", type=str, help="Sets block to create booster")
+    group.add_argument("-s", "--set", type=str, help="Sets set code to create booster")
     parser.add_argument("-n", "--count", type=int, default=1, help="Sets number of boosters to create")
     args = parser.parse_args()
-
-    sets = json.loads(requests.get('https://api.magicthegathering.io/v1/sets', data = {"block": args.block}).text)["sets"]
+    sets = []
+    if not args.block:
+        sets = json.loads(requests.get('https://api.magicthegathering.io/v1/sets', data = {"block": args.block}).text)["sets"]
     i = 0
     olddir = os.getcwd()
     while i < args.count:
         i += 1;
-        s = sets[random.randint(0, len(sets)-1)]
+        s = {}
+        if not sets:
+            s = sets[random.randint(0, len(sets)-1)]
+        else:
+            s= json.loads(requests.get('https://api.magicthegathering.io/v1/sets/' + args.set).text)["set"]
         dirname = "/tmp/booster"
         shutil.rmtree(dirname)
         try:
