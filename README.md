@@ -1,7 +1,7 @@
 # MTGBoosterCreate
 Script that creates some boosters for mtg
 
-** Blocks that available **
+**Blocks that available**
 * Alara
 * Battle for Zendikar
 * Ice Age
@@ -27,7 +27,7 @@ Script that creates some boosters for mtg
 * Zendikar
 
 
-** Sets codes **
+**Sets codes**
 * 10E
 * 2ED
 * 3ED
