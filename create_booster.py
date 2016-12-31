@@ -19,7 +19,7 @@ def main():
     olddir = os.getcwd()
     while i < args.count:
         i += 1;
-        s = sets[random.randint(0, len(sets)-1)]
+        s = sets[random.randint(0, len(sets))]
         dirname = "/tmp/booster"
         try:
             os.makedirs(dirname)
@@ -27,9 +27,18 @@ def main():
             print("Directory already exists")
         k = 0
         for j in s["booster"]:
+            if j == "land" or j == "marketing":
+                continue
             k += 1
-            cards = json.loads(requests.get('https://api.magicthegathering.io/v1/cards', data = { "set": s["code"], "rarity": j}).text)["cards"]
-            c = cards[random.randint(0,len(cards)-1)]
+            rr = ''
+            if isinstance(j, list):
+                for a in j:
+                    rr += a + ","
+                rr = rr[:-1]
+            else:
+                rr = j
+            cards = json.loads(requests.get('https://api.magicthegathering.io/v1/cards', data = { "set": s["code"], "rarity": rr}).text)["cards"]
+            c = cards[random.randint(0,len(cards))]
             picture = requests.get(c["imageUrl"])
             path = dirname + "/" + str(k) + ".jpg"
             fin = open(path, "w+b")
