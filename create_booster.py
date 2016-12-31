@@ -19,8 +19,9 @@ def main():
     olddir = os.getcwd()
     while i < args.count:
         i += 1;
-        s = sets[random.randint(0, len(sets))]
+        s = sets[random.randint(0, len(sets)-1)]
         dirname = "/tmp/booster"
+        shutil.rmtree(dirname)
         try:
             os.makedirs(dirname)
         except:
@@ -38,7 +39,7 @@ def main():
             else:
                 rr = j
             cards = json.loads(requests.get('https://api.magicthegathering.io/v1/cards', data = { "set": s["code"], "rarity": rr}).text)["cards"]
-            c = cards[random.randint(0,len(cards))]
+            c = cards[random.randint(0,len(cards)-1)]
             picture = requests.get(c["imageUrl"])
             path = dirname + "/" + str(k) + ".jpg"
             fin = open(path, "w+b")
