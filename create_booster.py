@@ -17,22 +17,34 @@ def main():
     args = parser.parse_args()
     sets = []
     if not args.block:
+        sets = []
+    else:
         sets = json.loads(requests.get('https://api.magicthegathering.io/v1/sets', data = {"block": args.block}).text)["sets"]
     i = 0
     olddir = os.getcwd()
+    dirname = "/tmp/booster"
+    try:
+        shutil.rmtree(dirname)
+        os.makedirs(dirname)
+    except:
+        print("Directory already exists")
+    os.chdir(dirname)
+    tex = open(dirname + "/template.tex", "w")
+    tex.write("\\documentclass[a4paper, 10pt]{extarticle}\n\
+\\usepackage[left=5mm, top=5mm, right=5mm, bottom=5mm, nohead, nofoot]{geometry}\n\
+\\usepackage{graphicx}\n\
+\\begin{document}\n")
     while i < args.count:
         i += 1;
         s = {}
         if not sets:
-            s = sets[random.randint(0, len(sets)-1)]
-        else:
             s= json.loads(requests.get('https://api.magicthegathering.io/v1/sets/' + args.set).text)["set"]
-        dirname = "/tmp/booster"
-        shutil.rmtree(dirname)
-        try:
-            os.makedirs(dirname)
-        except:
-            print("Directory already exists")
+        else:
+            s = sets[random.randint(0, len(sets)-1)]
+        if not args.block:
+            tex.write("\\center\n\\Huge{Set "+ s["code"] +"}}\n\\\\")
+        else:    
+            tex.write("\\center\n\\Huge{Block " + args.block + " Set "+ s["code"] +"}\n\\\\")
         k = 0
         for j in s["booster"]:
             if j == "land" or j == "marketing":
@@ -48,15 +60,19 @@ def main():
             cards = json.loads(requests.get('https://api.magicthegathering.io/v1/cards', data = { "set": s["code"], "rarity": rr}).text)["cards"]
             c = cards[random.randint(0,len(cards)-1)]
             picture = requests.get(c["imageUrl"])
-            path = dirname + "/" + str(k) + ".jpg"
+            path = dirname + "/" + str(i) + "_" + str(k) + ".jpg"
             fin = open(path, "w+b")
             fin.write(picture.content)
             fin.close()
-        shutil.copy("template.tex", dirname)
-        os.chdir(dirname)
-        os.system("pdflatex " + "template.tex")
-        os.chdir(olddir)
-        shutil.copy(dirname + "/template.pdf", "booster" + str(i) + ".pdf")
+            tex.write("\\includegraphics[width=63mm,height=88mm]{" + str(i) + "_"  + str(k) + ".jpg}\n")
+            if k % 3 == 0:
+                tex.write("\\\\\n")
+        tex.write("\\newpage\n")
+    tex.write("\\end{document}")
+    tex.close()
+    os.system("pdflatex " + "template.tex")
+    os.chdir(olddir)
+    shutil.copy(dirname + "/template.pdf", "boosters.pdf")
 
 if __name__ == "__main__":
     main()
