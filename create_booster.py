@@ -42,7 +42,7 @@ def main():
         else:
             s = sets[random.randint(0, len(sets)-1)]
         if not args.block:
-            tex.write("\\center\n\\Huge{Set "+ s["code"] +"}}\n\\\\")
+            tex.write("\\center\n\\Huge{Set "+ s["code"] +"}\n\\\\")
         else:    
             tex.write("\\center\n\\Huge{Block " + args.block + " Set "+ s["code"] +"}\n\\\\")
         k = 0
